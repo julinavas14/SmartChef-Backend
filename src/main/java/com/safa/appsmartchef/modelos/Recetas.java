@@ -3,9 +3,6 @@ package com.safa.appsmartchef.modelos;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Getter
 @Setter
 @AllArgsConstructor

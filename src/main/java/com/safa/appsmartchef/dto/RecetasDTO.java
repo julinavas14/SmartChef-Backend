@@ -2,11 +2,13 @@ package com.safa.appsmartchef.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class RecetasDTO {
     private Integer id_receta;
     private String nombre;

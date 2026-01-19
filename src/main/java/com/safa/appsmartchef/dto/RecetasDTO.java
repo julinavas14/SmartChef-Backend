@@ -1,5 +1,6 @@
 package com.safa.appsmartchef.dto;
 
+import com.safa.appsmartchef.modelos.Recetas;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

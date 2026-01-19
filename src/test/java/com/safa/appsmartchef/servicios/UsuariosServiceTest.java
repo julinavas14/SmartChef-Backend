@@ -1,16 +1,26 @@
 package com.safa.appsmartchef.servicios;
 
+import com.safa.appsmartchef.dto.CrearRecetasDTO;
 import com.safa.appsmartchef.dto.CrearUsuarioDTO;
+import com.safa.appsmartchef.dto.FavoritoMasPopularDTO;
+import com.safa.appsmartchef.dto.RecetasDTO;
+import com.safa.appsmartchef.excepciones.NoHayUsuariosConFavoritosException;
 import com.safa.appsmartchef.excepciones.UsuarioYaExisteException;
+import com.safa.appsmartchef.modelos.Recetas;
 import com.safa.appsmartchef.modelos.Tipo;
 import com.safa.appsmartchef.modelos.Usuarios;
+import com.safa.appsmartchef.modelos.UsuariosRecetas;
+import com.safa.appsmartchef.repositorio.RecetasRepository;
 import com.safa.appsmartchef.repositorio.TipoRepository;
+import com.safa.appsmartchef.repositorio.UsuarioRecetasRepository;
 import com.safa.appsmartchef.repositorio.UsuariosRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,7 +37,16 @@ public class UsuariosServiceTest {
     private UsuariosRepository usuariosRepository;
 
     @Autowired
+    private UsuarioRecetasRepository  usuarioRecetasRepository;
+
+    @Autowired
     private TipoRepository tipoRepository;
+
+    @Autowired
+    private RecetasService recetasService;
+
+    @Autowired
+    private RecetasRepository recetasRepository;
 
     private Tipo tipoVegano;
     private Tipo tipoProteinas;
@@ -65,7 +84,6 @@ public class UsuariosServiceTest {
     @Test
     @DisplayName("Servicio 1 -> Usuarios Positivo")
     void registrarUsuarioDatosCorrectosTest() {
-        // Given
         CrearUsuarioDTO dto = new CrearUsuarioDTO();
         dto.setNombreUsuario("julian_fit");
         dto.setEmail("julian_fit@safareyes.es");
@@ -116,5 +134,47 @@ public class UsuariosServiceTest {
                 .filter(u -> u.getEmail().equalsIgnoreCase("duplicado@safareyes.es"))
                 .count();
         assertEquals(1, cantidadConEseEmail, "Solo debería existir un usuario con ese email");
+    }
+
+    @Test
+    @DisplayName("8 - UsuarioPopular - Positivo - Con datos de favoritos")
+    void usuarioPopular_positivo_con_datos() {
+        CrearUsuarioDTO dtoUsuario = new CrearUsuarioDTO();
+        dtoUsuario.setNombreUsuario("usuario_popular");
+        dtoUsuario.setEmail("popular@test.es");
+        dtoUsuario.setContraseña("123456");
+        dtoUsuario.setIdTipo(tipoVegano.getId());
+        usuariosService.CrearUsuarios(dtoUsuario);
+
+        Usuarios usuario = usuariosRepository.findAll().stream()
+                .filter(u -> u.getNombreUsuario().equals("usuario_popular"))
+                .findFirst().orElseThrow();
+
+        CrearRecetasDTO dtoReceta = new CrearRecetasDTO();
+        dtoReceta.setNombre("Receta muy popular");
+        dtoReceta.setImagen("popular.jpg");
+        dtoReceta.setDescripcion("La favorita de todos");
+        dtoReceta.setIdTipo(tipoVegano.getId());
+        RecetasDTO recetaDTO = recetasService.crearReceta(dtoReceta);
+        Recetas receta = recetasRepository.findById(recetaDTO.getId_receta()).orElseThrow();
+
+        UsuariosRecetas favorito = new UsuariosRecetas();
+        favorito.setId_usuario(usuario);
+        favorito.setId_recetas(receta);
+        usuarioRecetasRepository.save(favorito);
+
+        List<FavoritoMasPopularDTO> resultado = usuariosService.obtenerUsuariosConRecetaMasPopular();
+
+        assertNotNull(resultado);
+        assertFalse(resultado.isEmpty());
+        assertEquals("usuario_popular", resultado.get(0).getNombreUsuario());
+    }
+
+
+    @Test
+    @DisplayName("Servicio 10 -> Negativo")
+    void usuarioPopular_negativo_sin_favoritos() {
+        assertThrows(NoHayUsuariosConFavoritosException.class,
+                () -> usuariosService.obtenerUsuariosConRecetaMasPopular());
     }
 }

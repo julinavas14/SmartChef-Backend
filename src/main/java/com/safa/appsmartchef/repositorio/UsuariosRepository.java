@@ -40,7 +40,7 @@ public interface UsuariosRepository extends JpaRepository<Usuarios, Integer> {
         )
     ) contador ON r.id_receta = contador.id_receta
     ORDER BY contador.total_favoritos DESC, u.nombre_usuario
-    """, nativeQuery = true)
+""", nativeQuery = true)
     List<FavoritoMasPopularDTO> findUsuariosConRecetaMasFavorita();
 
     boolean existsByEmailEqualsIgnoreCase(String email);

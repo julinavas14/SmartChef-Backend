@@ -87,7 +87,6 @@ public class UsuariosServiceTest {
     @Test
     @DisplayName("Servicio 1 -> Usuarios Negativo")
     void registrarUsuarioEmailYaExisteTest() {
-        // Given - Creamos primero un usuario para simular duplicado
         Usuarios usuarioPreexistente = new Usuarios();
         usuarioPreexistente.setNombreUsuario("usuario_duplicado");
         usuarioPreexistente.setEmail("duplicado@safareyes.es");

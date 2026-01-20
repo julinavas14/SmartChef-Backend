@@ -69,7 +69,7 @@ public class IngredienteRecetaServiceTest {
     }
 
     @Test
-    @DisplayName("Servicio 6 - Positivo ")
+    @DisplayName("Servicio 6 - Positivo")
     void CrearListaCompraTest() {
         CrearRecetasDTO dtoReceta = new CrearRecetasDTO("Gazpacho andaluz", "gazpacho.jpg", "Frío y rico", tipoVegano.getId());
         RecetasDTO receta = recetasService.crearReceta(dtoReceta);

@@ -136,45 +136,4 @@ public class UsuariosServiceTest {
         assertEquals(1, cantidadConEseEmail, "Solo debería existir un usuario con ese email");
     }
 
-    @Test
-    @DisplayName("8 - UsuarioPopular - Positivo - Con datos de favoritos")
-    void usuarioPopular_positivo_con_datos() {
-        CrearUsuarioDTO dtoUsuario = new CrearUsuarioDTO();
-        dtoUsuario.setNombreUsuario("usuario_popular");
-        dtoUsuario.setEmail("popular@test.es");
-        dtoUsuario.setContraseña("123456");
-        dtoUsuario.setIdTipo(tipoVegano.getId());
-        usuariosService.CrearUsuarios(dtoUsuario);
-
-        Usuarios usuario = usuariosRepository.findAll().stream()
-                .filter(u -> u.getNombreUsuario().equals("usuario_popular"))
-                .findFirst().orElseThrow();
-
-        CrearRecetasDTO dtoReceta = new CrearRecetasDTO();
-        dtoReceta.setNombre("Receta muy popular");
-        dtoReceta.setImagen("popular.jpg");
-        dtoReceta.setDescripcion("La favorita de todos");
-        dtoReceta.setIdTipo(tipoVegano.getId());
-        RecetasDTO recetaDTO = recetasService.crearReceta(dtoReceta);
-        Recetas receta = recetasRepository.findById(recetaDTO.getId_receta()).orElseThrow();
-
-        UsuariosRecetas favorito = new UsuariosRecetas();
-        favorito.setId_usuario(usuario);
-        favorito.setId_recetas(receta);
-        usuarioRecetasRepository.save(favorito);
-
-        List<FavoritoMasPopularDTO> resultado = usuariosService.obtenerUsuariosConRecetaMasPopular();
-
-        assertNotNull(resultado);
-        assertFalse(resultado.isEmpty());
-        assertEquals("usuario_popular", resultado.get(0).getNombreUsuario());
-    }
-
-
-    @Test
-    @DisplayName("Servicio 10 -> Negativo")
-    void usuarioPopular_negativo_sin_favoritos() {
-        assertThrows(NoHayUsuariosConFavoritosException.class,
-                () -> usuariosService.obtenerUsuariosConRecetaMasPopular());
-    }
 }

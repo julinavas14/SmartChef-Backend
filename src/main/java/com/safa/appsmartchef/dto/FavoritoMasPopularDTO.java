@@ -1,12 +1,12 @@
 package com.safa.appsmartchef.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Setter
+@Getter
 public class FavoritoMasPopularDTO {
     private Integer usuarioId;
     private String nombreUsuario;

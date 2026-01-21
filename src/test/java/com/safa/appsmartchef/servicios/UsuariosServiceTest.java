@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -55,6 +56,8 @@ public class UsuariosServiceTest {
     void cargarDatosIniciales() {
         usuariosRepository.deleteAll();
         tipoRepository.deleteAll();
+        recetasRepository.deleteAll();
+        usuarioRecetasRepository.deleteAll();
 
         Tipo t1 = new Tipo();
         t1.setNombre("ComidaBasura");
@@ -74,6 +77,11 @@ public class UsuariosServiceTest {
 
         tipoProteinas = t3;
         tipoVegano = t4;
+
+
+        tipoVegano = new Tipo();
+        tipoVegano.setNombre("Veganos");
+        tipoVegano = tipoRepository.saveAndFlush(tipoVegano);
     }
 
     @BeforeEach
@@ -134,6 +142,68 @@ public class UsuariosServiceTest {
                 .filter(u -> u.getEmail().equalsIgnoreCase("duplicado@safareyes.es"))
                 .count();
         assertEquals(1, cantidadConEseEmail, "Solo debería existir un usuario con ese email");
+    }
+
+    @Test
+    @DisplayName("Servicio 10 -> Positivo")
+    void MostrarUsuariosConMasRecetasGuardadasTest() {
+        Usuarios nuevoUsuario = new Usuarios();
+        nuevoUsuario.setNombreUsuario("usuario");
+        nuevoUsuario.setEmail("usuario@safareyes.es");
+        nuevoUsuario.setContraseña("123456");
+        nuevoUsuario.setTipo(tipoVegano);
+        usuariosRepository.saveAndFlush(nuevoUsuario);
+
+        Usuarios nuevoUsuario2 = new Usuarios();
+        nuevoUsuario2.setNombreUsuario("usuario2");
+        nuevoUsuario2.setEmail("usuario2@safareyes.es");
+        nuevoUsuario2.setContraseña("123456");
+        nuevoUsuario2.setTipo(tipoVegano);
+        usuariosRepository.saveAndFlush(nuevoUsuario2);
+
+        Usuarios nuevoUsuario3 = new Usuarios();
+        nuevoUsuario3.setNombreUsuario("usuario3");
+        nuevoUsuario3.setEmail("usuario3@safareyes.es");
+        nuevoUsuario3.setContraseña("123456");
+        nuevoUsuario3.setTipo(tipoVegano);
+        usuariosRepository.saveAndFlush(nuevoUsuario3);
+
+        Recetas receta1 = new Recetas();
+        receta1.setNombre("Receta B");
+        receta1.setImagen("imgB.jpg");
+        receta1.setDescripcion("desc B");
+        receta1.setFavoritos(1);
+        receta1.setTipo(tipoVegano);
+        recetasRepository.saveAndFlush(receta1);
+
+        Recetas receta2 = new Recetas();
+        receta2.setNombre("Receta B");
+        receta2.setImagen("imgB.jpg");
+        receta2.setDescripcion("desc B");
+        receta2.setFavoritos(1);
+        receta2.setTipo(tipoVegano);
+        recetasRepository.saveAndFlush(receta2);
+
+        UsuariosRecetas UsuariosRecetas = new UsuariosRecetas();
+        UsuariosRecetas.setId_recetas(receta1);
+        UsuariosRecetas.setId_usuario(nuevoUsuario);
+        usuarioRecetasRepository.saveAndFlush(UsuariosRecetas);
+
+        UsuariosRecetas UsuariosRecetas2 = new UsuariosRecetas();
+        UsuariosRecetas2.setId_recetas(receta1);
+        UsuariosRecetas2.setId_usuario(nuevoUsuario2);
+        usuarioRecetasRepository.saveAndFlush(UsuariosRecetas2);
+
+        List<FavoritoMasPopularDTO> lista = usuariosRepository.findUsuariosConRecetaMasFavorita();
+        assertFalse(lista.isEmpty(), "La lista esta vacía");
+        assertEquals(2, lista.size(), "Deberían de aparecer 2 usuarios");
+    }
+
+
+    @Test
+    @DisplayName("Servicio 10 -> Negativo")
+    void MostrarUsuariosConRecetasGuardadasNegativoTest() {
+        assertThrows(NoHayUsuariosConFavoritosException.class, () -> usuariosService.obtenerUsuariosConRecetaMasPopular());
     }
 
 }

@@ -1,15 +1,15 @@
 package com.safa.appsmartchef.dto;
 
 import com.safa.appsmartchef.modelos.Recetas;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Setter
+@Getter
 public class RecetasDTO {
     private Integer id_receta;
     private String nombre;

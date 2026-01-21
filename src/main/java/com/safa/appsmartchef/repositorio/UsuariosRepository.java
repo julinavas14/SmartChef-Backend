@@ -21,27 +21,36 @@ public interface UsuariosRepository extends JpaRepository<Usuarios, Integer> {
         r.nombre AS nombreReceta,
         r.imagen AS imagenReceta,
         r.descripcion AS descripcionReceta,
-        tipo_receta.nombre_tipo AS tipoReceta,
-        contador.total_favoritos AS vecesGuardadaComoFavorita
+        t.nombre_tipo AS tipoReceta,
+        fav.total_favoritos AS vecesGuardadaComoFavorita
     FROM usuarios u
-    INNER JOIN usuarios_recetas ur ON u.id_usuario = ur.id_usuario
-    INNER JOIN recetas r ON ur.id_receta = r.id_receta
-    INNER JOIN tipos tipo_receta ON r.id_tipo = tipo_receta.id_tipo
+    INNER JOIN usuarios_recetas ur 
+        ON u.id_usuario = ur.id_usuario
+    INNER JOIN recetas r 
+        ON ur.id_recetas = r.id_receta
+    INNER JOIN tipos t 
+        ON r.id_tipo = t.id_tipo
     INNER JOIN (
-        SELECT id_receta, COUNT(*) AS total_favoritos
-        FROM usuarios_recetas
-        GROUP BY id_receta
+        SELECT 
+            ur2.id_recetas AS id_receta,
+            COUNT(*) AS total_favoritos
+        FROM usuarios_recetas ur2
+        GROUP BY ur2.id_recetas
         HAVING COUNT(*) = (
-            SELECT COUNT(*)
-            FROM usuarios_recetas
-            GROUP BY id_receta
-            ORDER BY COUNT(*) DESC
-            LIMIT 1
+            SELECT MAX(contador)
+            FROM (
+                SELECT COUNT(*) AS contador
+                FROM usuarios_recetas
+                GROUP BY id_recetas
+            ) sub
         )
-    ) contador ON r.id_receta = contador.id_receta
-    ORDER BY contador.total_favoritos DESC, u.nombre_usuario
+    ) fav 
+        ON r.id_receta = fav.id_receta
+    ORDER BY fav.total_favoritos DESC, u.nombre_usuario
 """, nativeQuery = true)
     List<FavoritoMasPopularDTO> findUsuariosConRecetaMasFavorita();
+
+
 
     boolean existsByEmailEqualsIgnoreCase(String email);
 

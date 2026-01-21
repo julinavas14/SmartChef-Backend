@@ -1,10 +1,10 @@
 package com.safa.appsmartchef.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class UsuariosDTO {
     private Integer id_usuario;
     private String nombreUsuario;

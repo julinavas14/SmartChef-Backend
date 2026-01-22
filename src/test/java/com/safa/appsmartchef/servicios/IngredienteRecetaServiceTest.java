@@ -132,7 +132,7 @@ public class IngredienteRecetaServiceTest {
 
         CrearHistorialCocinaDTO dtoHistorial = new CrearHistorialCocinaDTO();
         dtoHistorial.setUsuario(usuario.getId_usuario());
-        dtoHistorial.setReceta(999999);  // ID inválido
+        dtoHistorial.setReceta(999999);
         dtoHistorial.setFecha("19-01-2026 14:30");
 
         assertThrows(Exception.class, () -> historialService.crearHistorialCocina(dtoHistorial));

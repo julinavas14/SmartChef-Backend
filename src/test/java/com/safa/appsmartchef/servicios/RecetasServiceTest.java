@@ -110,8 +110,8 @@ public class RecetasServiceTest {
     @DisplayName("Servicio 4 -> Positivo")
     public void MostrarRecetaPorIdTest() {
         CrearRecetasDTO dto = new CrearRecetasDTO("Receta Visible", "img.jpg", "desc", tipoValido.getId());
-        RecetasDTO creada = recetasService.crearReceta(dto);
-        Integer idCreado = creada.getId_receta();
+        RecetasDTO receta = recetasService.crearReceta(dto);
+        Integer idCreado = receta.getId_receta();
 
         RecetasDTO result = recetasService.buscarPorId(idCreado);
 
@@ -131,8 +131,8 @@ public class RecetasServiceTest {
     @DisplayName("Servicio 5 -> Positivo")
     public void MarcarFavoritoTest() {
         CrearRecetasDTO dto = new CrearRecetasDTO("Receta Favorita", "fav.jpg", "desc fav", tipoValido.getId());
-        RecetasDTO creada = recetasService.crearReceta(dto);
-        Integer id = creada.getId_receta();
+        RecetasDTO receta = recetasService.crearReceta(dto);
+        Integer id = receta.getId_receta();
 
         String resultado = recetasService.marcarFavoritos(id);
 

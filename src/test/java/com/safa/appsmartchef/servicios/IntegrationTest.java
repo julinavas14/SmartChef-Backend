@@ -1,27 +1,23 @@
 package com.safa.appsmartchef.servicios;
 
 import com.safa.appsmartchef.conversores.CrearUsuariosMapper;
+import com.safa.appsmartchef.conversores.HistorialCocinaMapper;
 import com.safa.appsmartchef.conversores.RecetasMapper;
-import com.safa.appsmartchef.dto.CrearRecetasDTO;
-import com.safa.appsmartchef.dto.CrearUsuarioDTO;
-import com.safa.appsmartchef.dto.RecetasDTO;
-import com.safa.appsmartchef.modelos.Recetas;
-import com.safa.appsmartchef.modelos.Tipo;
-import com.safa.appsmartchef.modelos.Usuarios;
-import com.safa.appsmartchef.repositorio.RecetasRepository;
-import com.safa.appsmartchef.repositorio.TipoRepository;
-import com.safa.appsmartchef.repositorio.UsuariosRepository;
+import com.safa.appsmartchef.dto.*;
+import com.safa.appsmartchef.modelos.*;
+import com.safa.appsmartchef.repositorio.*;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.time.Instant;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -32,12 +28,26 @@ public class IntegrationTest {
     @InjectMocks
     private RecetasService recetasService;
 
+    @InjectMocks
+    private HistorialCocinaService historialCocinaService;
+
+    @Mock
+    private HistorialCocinaRepository historialCocinaRepository;
+
+    @InjectMocks
+    private IngredienteRecetaService ingredienteRecetaService;
+
+    @Mock
+    private RecetasIngredientesRepository recetasIngredientesRepository;
+
     @Mock
     private RecetasRepository recetasRepository;
 
     @InjectMocks
     private UsuariosService  usuariosService;
 
+    @Mock
+    private HistorialCocinaMapper historialCocinaMapper;
 
     @Mock
     private UsuariosRepository usuariosRepository;
@@ -82,6 +92,7 @@ public class IntegrationTest {
         when(usuariosRepository.save(any(Usuarios.class))).thenReturn(usuario);
 
         String result = usuariosService.CrearUsuarios(nuevoUsuario);
+        assertNotNull(result);
 
         verify(usuariosRepository).save(usuario);
     }
@@ -95,6 +106,12 @@ public class IntegrationTest {
         dto.setDescripcion("...");
         dto.setIdTipo(1);
 
+        RecetasDTO recetasDTO = new RecetasDTO();
+        recetasDTO.setNombre("receta");
+        recetasDTO.setImagen("receta.jpg");
+        recetasDTO.setDescripcion("...");
+        recetasDTO.setId_tipo(1);
+
         Recetas recetas = new Recetas();
         recetas.setNombre("receta");
         recetas.setImagen("receta.jpg");
@@ -104,11 +121,12 @@ public class IntegrationTest {
 
         when(recetasRepository.existsByNombreIgnoreCase(dto.getNombre())).thenReturn(false);
         when(tipoRepository.findById(dto.getIdTipo())).thenReturn(Optional.of(new Tipo()));
-        when(recetasRepository.findByNombre("receta")).thenReturn(Optional.of(new Recetas()));
         when(recetasMapper.convertirAEntity2(dto)).thenReturn(recetas);
         when(recetasRepository.save(recetas)).thenReturn(recetas);
+        when(recetasMapper.convertirADTO(recetas)).thenReturn(recetasDTO);
 
         RecetasDTO receta = recetasService.crearReceta(dto);
+        assertNotNull(receta);
 
         verify(recetasRepository).save(recetas);
     }
@@ -153,6 +171,7 @@ public class IntegrationTest {
         when(this.recetasMapper.convertirAEntity2(dto)).thenReturn(recetas);
 
         List<RecetasDTO> receta = recetasService.obtenerPorCategoria(1);
+        assertNotNull(receta);
 
         verify(this.recetasRepository).buscarPorCategoria(dto.getIdTipo());
     }
@@ -185,7 +204,149 @@ public class IntegrationTest {
     @Test
     @DisplayName("Servicio 6 -> Integración")
     void CrearListaCompraConIdCorrectoTestINT(){
+        Tipo  tipo = new Tipo();
+        tipo.setId(1);
+        tipo.setNombre("vegano");
+
+        Recetas recetas = new Recetas();
+        recetas.setId_receta(10);
+        recetas.setNombre("receta");
+        recetas.setImagen("receta.jpg");
+        recetas.setDescripcion("...");
+        recetas.setTipo(tipo);
+        recetas.setFavoritos(1);
+
+        Ingredientes ingredientes = new Ingredientes();
+        ingredientes.setId_ingrediente(10);
+        ingredientes.setNombre_ingrediente("tomate");
+
+        RecetasIngredientes ri =  new RecetasIngredientes();
+        ri.setId_ingrediente_receta(1);
+        ri.setId_receta(recetas);
+        ri.setId_ingrediente(ingredientes);
+        ri.setCantidad("200G");
 
 
+        when(this.recetasRepository.existsById(recetas.getId_receta())).thenReturn(true);
+        when(this.recetasIngredientesRepository.obtenerIngredientesDeReceta(recetas.getId_receta())).thenReturn(List.of(ingredientes.getNombre_ingrediente()));
+
+        List<String> lista = ingredienteRecetaService.findListaCompra(recetas.getId_receta());
+        assertNotNull(lista);
+        assertFalse(lista.isEmpty());
+        assertEquals(1, lista.size());
+        assertEquals("tomate", lista.get(0));
+
+        verify(recetasRepository).existsById(10);
+        verify(recetasIngredientesRepository).obtenerIngredientesDeReceta(10);
     }
+
+    @Test
+    @DisplayName("Servicio 7 -> Integración")
+    void CrearHistorialConIDCorrectosTestINT(){
+        Tipo  tipo = new Tipo();
+        tipo.setId(1);
+        tipo.setNombre("vegano");
+
+        Recetas recetas = new Recetas();
+        recetas.setId_receta(10);
+        recetas.setNombre("receta");
+        recetas.setImagen("receta.jpg");
+        recetas.setDescripcion("...");
+        recetas.setTipo(tipo);
+
+        Usuarios usuario = new Usuarios();
+        usuario.setNombreUsuario("usuario");
+        usuario.setEmail("usuario@safareyes.es");
+        usuario.setContraseña("123456");
+        usuario.setTipo(tipo);
+
+        HistorialCocina historialCocina = new HistorialCocina();
+        historialCocina.setId_usuario(usuario);
+        historialCocina.setId_receta(recetas);
+        historialCocina.setFecha(Date.from(Instant.now()));
+
+        CrearHistorialCocinaDTO historial = new CrearHistorialCocinaDTO();
+        historial.setUsuario(usuario.getId_usuario());
+        historial.setReceta(recetas.getId_receta());
+        historial.setFecha("19/01/2026, 14:30");
+
+        when(historialCocinaMapper.convertirEntityCrear(historial)).thenReturn(historialCocina);
+        when(historialCocinaRepository.save(historialCocina)).thenReturn(historialCocina);
+        when(historialCocinaMapper.convertirDTOCrear(historialCocina)).thenReturn(historial);
+
+        CrearHistorialCocinaDTO resultado = historialCocinaService.crearHistorialCocina(historial);
+        List<CrearHistorialCocinaDTO> lista = List.of(resultado);
+
+        // Verificaciones
+        assertNotNull(lista);
+        assertEquals(1, lista.size());
+        assertEquals(historial.getUsuario(), lista.get(0).getUsuario());
+        assertEquals(historial.getReceta(), lista.get(0).getReceta());
+
+        verify(historialCocinaRepository).save(historialCocina);
+    }
+
+    @Test
+    @DisplayName("Servicio 8 -> Integración")
+    void MostrarHistorialConIDCorrectosTestINT(){
+        Tipo  tipo = new Tipo();
+        tipo.setId(1);
+        tipo.setNombre("vegano");
+
+        Recetas recetas = new Recetas();
+        recetas.setId_receta(10);
+        recetas.setNombre("receta");
+        recetas.setImagen("receta.jpg");
+        recetas.setDescripcion("...");
+        recetas.setTipo(tipo);
+
+        Usuarios usuario = new Usuarios();
+        usuario.setNombreUsuario("usuario");
+        usuario.setEmail("usuario@safareyes.es");
+        usuario.setContraseña("123456");
+        usuario.setTipo(tipo);
+
+        RecetasDTO recetasDTO = new RecetasDTO();
+        recetasDTO.setId_receta(10);
+        recetasDTO.setNombre("receta");
+        recetasDTO.setImagen("receta.jpg");
+        recetasDTO.setDescripcion("...");
+        recetasDTO.setId_tipo(tipo.getId());
+
+        UsuariosDTO usuarioDTO = new UsuariosDTO();
+        usuarioDTO.setNombreUsuario("usuario");
+        usuarioDTO.setEmail("usuario@safareyes.es");
+        usuarioDTO.setContraseña("123456");
+        usuarioDTO.setId_tipo(tipo.getId());
+
+        HistorialCocinaDTO historialDTO = new HistorialCocinaDTO();
+        historialDTO.setUsuario(usuarioDTO);
+        historialDTO.setReceta(recetasDTO);
+        historialDTO.setFecha("19/01/2026, 14:30");
+
+        HistorialCocina historialCocina = new HistorialCocina();
+        historialCocina.setId_usuario(usuario);
+        historialCocina.setId_receta(recetas);
+        historialCocina.setFecha(Date.from(Instant.now()));
+
+        when(historialCocinaRepository.findAll()).thenReturn(List.of(historialCocina));
+        when(historialCocinaMapper.convertirADTOLista(List.of(historialCocina))).thenReturn(List.of(historialDTO));
+
+        List<HistorialCocinaDTO> lista = historialCocinaService.buscarHistorialCocina();
+
+        assertNotNull(lista);
+        assertFalse(lista.isEmpty());
+        assertEquals(1, lista.size());
+
+        verify(historialCocinaRepository).findAll();
+        verify(historialCocinaMapper).convertirADTOLista(List.of(historialCocina));
+    }
+
+    @Test
+    @DisplayName("Servicio 9 -> Integración")
+    void MostrarLos5IngredientesMasUsadosTestINT(){
+        
+    }
+
+
 }

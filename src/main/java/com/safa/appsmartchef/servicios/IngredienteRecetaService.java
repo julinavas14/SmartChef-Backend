@@ -45,15 +45,13 @@ public class IngredienteRecetaService {
             throw new RecetaNoEncontradaException("No se encontró ninguna receta con el ID: " + idReceta);
         }
 
-        List<Object[]> ingredientes = recetasIngredientesRepository.obtenerIngredientesDeReceta(idReceta);
+        List<String> ingredientes = recetasIngredientesRepository.obtenerIngredientesDeReceta(idReceta);
 
         if (ingredientes == null || ingredientes.isEmpty()) {
             throw new ListaCompraVaciaException("La receta con ID " + idReceta + " no tiene ingredientes asociados. No se puede generar la lista de la compra.");
         }
 
-        return ingredientes.stream()
-                .map(row -> (String) row[0] + " " + row[1])
-                .collect(Collectors.toList());
+        return ingredientes;
     }
 
     public CrearIngredienteRecetaDTO agregarIngrediente(CrearIngredienteRecetaDTO dto) {

@@ -25,5 +25,5 @@ public interface RecetasIngredientesRepository extends JpaRepository<RecetasIngr
             "INNER JOIN ingredientes i ON ri.id_ingrediente = i.id_ingrediente " +
             "WHERE ri.id_receta = :idReceta",
             nativeQuery = true)
-    List<Object[]> obtenerIngredientesDeReceta(@Param("idReceta") Integer idReceta);
+    List<String> obtenerIngredientesDeReceta(@Param("idReceta") Integer idReceta);
 }

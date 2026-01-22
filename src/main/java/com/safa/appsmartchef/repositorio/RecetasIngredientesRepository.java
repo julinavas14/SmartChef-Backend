@@ -18,7 +18,7 @@ public interface RecetasIngredientesRepository extends JpaRepository<RecetasIngr
         GROUP BY i.id_ingrediente, i.nombre_ingrediente
         ORDER BY total DESC, i.nombre_ingrediente ASC
         LIMIT 5""", nativeQuery = true)
-    List<Object[]> findTop5IngredientesMasUtilizados();
+    List<String> findTop5IngredientesMasUtilizados();
 
     @Query(value = "SELECT i.nombre_ingrediente, ri.cantidad " +
             "FROM recetas_ingredientes ri " +

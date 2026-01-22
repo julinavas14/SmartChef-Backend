@@ -26,15 +26,13 @@ public class IngredienteRecetaService {
     private CrearIngredienteRecetaMapper crearIngredienteRecetaMapper;
 
     public List<String> findIngredientes5() {
-        List<Object[]> top5 = recetasIngredientesRepository.findTop5IngredientesMasUtilizados();
+        List<String> top5 = recetasIngredientesRepository.findTop5IngredientesMasUtilizados();
         if (top5 == null || top5.isEmpty()) {
             throw new IngredienteNoEncontradoException(
                     "Aún no hay suficientes recetas con ingredientes para mostrar los más populares."
             );
         }
-        return top5.stream()
-                .map(row -> (String) row[0] + " " + row[1])
-                .collect(Collectors.toList());
+        return top5;
     }
 
 

@@ -150,30 +150,37 @@ public class IntegrationTest {
     @Test
     @DisplayName("Servicio 4 -> Integración")
     void MostrarRecetaConIdTipoCorrectoTestINT(){
-        Tipo  tipo = new Tipo();
+        Tipo tipo = new Tipo();
         tipo.setId(1);
         tipo.setNombre("vegano");
 
-        CrearRecetasDTO dto = new CrearRecetasDTO();
-        dto.setNombre("receta");
-        dto.setImagen("receta.jpg");
-        dto.setDescripcion("...");
-        dto.setIdTipo(1);
-
         Recetas recetas = new Recetas();
+        recetas.setId_receta(10);
         recetas.setNombre("receta");
         recetas.setImagen("receta.jpg");
         recetas.setDescripcion("...");
         recetas.setTipo(tipo);
         recetas.setFavoritos(1);
 
-        when(this.recetasRepository.buscarPorCategoria(recetas.getTipo().getId())).thenReturn(Collections.singletonList(recetas));
-        when(this.recetasMapper.convertirAEntity2(dto)).thenReturn(recetas);
+        RecetasDTO recetaDTO = new RecetasDTO();
+        recetaDTO.setId_receta(10);
+        recetaDTO.setNombre("receta");
+        recetaDTO.setImagen("receta.jpg");
+        recetaDTO.setDescripcion("...");
+        recetaDTO.setId_tipo(1);
 
-        List<RecetasDTO> receta = recetasService.obtenerPorCategoria(1);
-        assertNotNull(receta);
+        when(this.recetasRepository.buscarPorCategoria(1)).thenReturn(List.of(recetas));
+        when(this.recetasMapper.convertirTodosDTO(anyList())).thenReturn(List.of(recetaDTO));
 
-        verify(this.recetasRepository).buscarPorCategoria(dto.getIdTipo());
+        List<RecetasDTO> resultado = recetasService.obtenerPorCategoria(1);
+
+        assertNotNull(resultado);
+        assertFalse(resultado.isEmpty());
+        assertEquals(1, resultado.size());
+        assertEquals("receta", resultado.get(0).getNombre());
+
+        verify(this.recetasRepository).buscarPorCategoria(1);
+        verify(this.recetasMapper).convertirTodosDTO(anyList());
     }
 
     @Test
@@ -345,7 +352,76 @@ public class IntegrationTest {
     @Test
     @DisplayName("Servicio 9 -> Integración")
     void MostrarLos5IngredientesMasUsadosTestINT(){
-        
+        Tipo  tipo = new Tipo();
+        tipo.setId(1);
+        tipo.setNombre("vegano");
+
+        Recetas recetas = new Recetas();
+        recetas.setId_receta(10);
+        recetas.setNombre("receta");
+        recetas.setImagen("receta.jpg");
+        recetas.setDescripcion("...");
+        recetas.setTipo(tipo);
+        recetas.setFavoritos(1);
+
+        Ingredientes ingredientes = new Ingredientes();
+        ingredientes.setId_ingrediente(10);
+        ingredientes.setNombre_ingrediente("tomate");
+
+        RecetasIngredientes ri =  new RecetasIngredientes();
+        ri.setId_ingrediente_receta(1);
+        ri.setId_receta(recetas);
+        ri.setId_ingrediente(ingredientes);
+        ri.setCantidad("200G");
+
+        when(recetasIngredientesRepository.findTop5IngredientesMasUtilizados()).thenReturn(List.of(ingredientes.getNombre_ingrediente()));
+
+        List<String> lista = ingredienteRecetaService.findIngredientes5();
+        assertNotNull(lista);
+        assertFalse(lista.isEmpty());
+        assertTrue(lista.contains("tomate"));
+
+        verify(recetasIngredientesRepository).findTop5IngredientesMasUtilizados();
+    }
+
+    @Test
+    @DisplayName("Servicio 10 -> Integración")
+    void MostrarUsuariosConRecetasMasGuardadasTestINT(){
+        Tipo  tipo = new Tipo();
+        tipo.setId(1);
+        tipo.setNombre("vegano");
+
+        Recetas recetas = new Recetas();
+        recetas.setId_receta(10);
+        recetas.setNombre("receta");
+        recetas.setImagen("receta.jpg");
+        recetas.setDescripcion("...");
+        recetas.setTipo(tipo);
+        recetas.setFavoritos(1);
+
+        Usuarios usuario = new Usuarios();
+        usuario.setNombreUsuario("usuario");
+        usuario.setEmail("usuario@safareyes.es");
+        usuario.setContraseña("123456");
+        usuario.setTipo(tipo);
+
+        FavoritoMasPopularDTO favoritoMasPopularDTO = new FavoritoMasPopularDTO();
+        favoritoMasPopularDTO.setRecetaId(recetas.getId_receta());
+        favoritoMasPopularDTO.setUsuarioId(usuario.getId_usuario());
+        favoritoMasPopularDTO.setNombreReceta("receta");
+        favoritoMasPopularDTO.setImagenReceta("receta.jpg");
+        favoritoMasPopularDTO.setTipoReceta("vegano");
+        favoritoMasPopularDTO.setNombreUsuario(usuario.getNombreUsuario());
+        favoritoMasPopularDTO.setDescripcionReceta("...");
+        favoritoMasPopularDTO.setEmail(usuario.getEmail());
+
+        when(usuariosRepository.findUsuariosConRecetaMasFavorita()).thenReturn(List.of(favoritoMasPopularDTO));
+
+        List<FavoritoMasPopularDTO> resultado = usuariosService.obtenerUsuariosConRecetaMasPopular();
+        assertNotNull(resultado);
+        assertFalse(resultado.isEmpty());
+
+        verify(usuariosRepository).findUsuariosConRecetaMasFavorita();
     }
 
 

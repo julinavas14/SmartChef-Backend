@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UsuariosRepository extends JpaRepository<Usuarios, Integer> {
@@ -49,7 +50,6 @@ public interface UsuariosRepository extends JpaRepository<Usuarios, Integer> {
     ORDER BY fav.total_favoritos DESC, u.nombre_usuario
 """, nativeQuery = true)
     List<FavoritoMasPopularDTO> findUsuariosConRecetaMasFavorita();
-
 
 
     boolean existsByEmailEqualsIgnoreCase(String email);

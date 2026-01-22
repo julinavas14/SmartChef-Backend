@@ -3,7 +3,6 @@ package com.safa.appsmartchef.servicios;
 import com.safa.appsmartchef.conversores.MarcarRecetaFavMapper;
 import com.safa.appsmartchef.conversores.RecetasMapper;
 import com.safa.appsmartchef.dto.CrearRecetasDTO;
-import com.safa.appsmartchef.dto.MarcarRecetaFavDTO;
 import com.safa.appsmartchef.dto.RecetasDTO;
 import com.safa.appsmartchef.excepciones.ElementoNoEncontradoException;
 import com.safa.appsmartchef.excepciones.RecetaYaExisteException;
@@ -13,7 +12,6 @@ import com.safa.appsmartchef.modelos.Tipo;
 import com.safa.appsmartchef.repositorio.RecetasRepository;
 import com.safa.appsmartchef.repositorio.TipoRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -89,7 +87,6 @@ public class RecetasService {
         } else {
             receta.setFavoritos(1);
             recetasRepository.save(receta);
-            marcarRecetaFavMapper.convertirDTO(receta);
             return "Puesto en favoritos";
         }
     }

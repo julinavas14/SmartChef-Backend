@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RecetasRepository extends JpaRepository<Recetas, Integer> {
@@ -15,4 +16,5 @@ public interface RecetasRepository extends JpaRepository<Recetas, Integer> {
     @Query("SELECT r FROM Recetas r WHERE r.tipo.id = :idTipo")
     List<Recetas> buscarPorCategoria(@Param("idTipo") Integer idTipo);
 
+    Optional<Recetas> findByNombre(String nombre);
 }

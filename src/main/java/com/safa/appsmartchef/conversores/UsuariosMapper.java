@@ -16,6 +16,8 @@ public interface UsuariosMapper {
     @Mapping(source = "tipo.nombre", target = "nombre_tipo")
     UsuariosDTO convertirADTO(Usuarios entity);
 
+
+
     List<UsuariosDTO> convertirADTO(List<Usuarios> usuarios);
 
     List<Usuarios> convertirAEntity(List<UsuariosDTO> usuariosDTO);

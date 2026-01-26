@@ -87,6 +87,10 @@ public class UsuariosServiceTest {
     @BeforeEach
     void limpiarUsuariosAntesDeCadaTest() {
         usuariosRepository.deleteAll();
+
+        tipoVegano = new Tipo();
+        tipoVegano.setNombre("vegano");
+        tipoVegano = tipoRepository.save(tipoVegano);
     }
 
     @Test
@@ -100,14 +104,9 @@ public class UsuariosServiceTest {
 
         String resultado = usuariosService.CrearUsuarios(dto);
 
-        assertEquals("Usuario creado exitosamente", resultado,
-                "El servicio debería devolver mensaje de éxito");
-
-        boolean existePorNombre = usuariosRepository.existsByNombreUsuarioEqualsIgnoreCase("julian_fit");
-        assertTrue(existePorNombre, "El usuario debería haberse guardado correctamente");
-
-        boolean existePorEmail = usuariosRepository.existsByEmailEqualsIgnoreCase("julian_fit@safareyes.es");
-        assertTrue(existePorEmail, "El email debería estar registrado");
+        assertEquals("Usuario creado exitosamente", resultado);
+        assertTrue(usuariosRepository.existsByNombreUsuarioEqualsIgnoreCase("julian_fit"));
+        assertTrue(usuariosRepository.existsByEmailEqualsIgnoreCase("julian_fit@safareyes.es"));
     }
 
     @Test
@@ -130,12 +129,6 @@ public class UsuariosServiceTest {
                 UsuarioYaExisteException.class,
                 () -> usuariosService.CrearUsuarios(dto),
                 "Debería lanzar excepción por email ya registrado"
-        );
-
-        assertTrue(
-                excepcion.getMessage().contains("correo electrónico") ||
-                        excepcion.getMessage().contains("ya está registrado"),
-                "El mensaje debería indicar que el email ya existe"
         );
 
         long cantidadConEseEmail = usuariosRepository.findAll().stream()

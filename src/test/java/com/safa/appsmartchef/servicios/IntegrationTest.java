@@ -203,8 +203,8 @@ public class IntegrationTest {
         when(this.recetasRepository.save(recetas)).thenReturn(recetas);
 
         String lista = recetasService.marcarFavoritos(recetas.getId_receta());
-        assertNotNull(lista);
 
+        assertNotNull(lista);
         verify(recetasRepository).save(recetas);
     }
 

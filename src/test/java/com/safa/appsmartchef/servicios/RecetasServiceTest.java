@@ -51,7 +51,7 @@ public class RecetasServiceTest {
 
     @Test
     @DisplayName("Servicio 2 -> Positivo")
-    public void testRegistrarReceta() {
+    public void RegistrarRecetaTest() {
         CrearRecetasDTO dto = new CrearRecetasDTO();
         dto.setNombre("Receta Test");
         dto.setDescripcion("Descripción de prueba");
@@ -62,7 +62,6 @@ public class RecetasServiceTest {
 
         assertNotNull(result, "La receta creada no debería ser nula");
         assertEquals("Receta Test", result.getNombre(), "El nombre no coincide");
-
         assertTrue(recetasRepository.existsByNombreIgnoreCase("Receta Test"));
     }
 
@@ -108,7 +107,7 @@ public class RecetasServiceTest {
 
     @Test
     @DisplayName("Servicio 4 -> Positivo")
-    public void MostrarRecetaPorIdTest() {
+    public void MostrarRecetaPorIdTipoTest() {
         CrearRecetasDTO dto = new CrearRecetasDTO("Receta Visible", "img.jpg", "desc", tipoValido.getId());
         RecetasDTO receta = recetasService.crearReceta(dto);
         Integer idCreado = receta.getId_receta();
@@ -137,7 +136,6 @@ public class RecetasServiceTest {
         String resultado = recetasService.marcarFavoritos(id);
 
         assertEquals("Puesto en favoritos", resultado, "El mensaje no es el esperado");
-
         Recetas actualizada = recetasRepository.findById(id).orElseThrow();
         assertEquals(1, actualizada.getFavoritos(), "El campo favoritos debería ser 1");
     }

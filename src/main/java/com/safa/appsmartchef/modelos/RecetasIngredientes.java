@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "recetas_ingredientes")
+@Table(name = "recetas_ingredientes", schema = "smartchef")
 public class RecetasIngredientes {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

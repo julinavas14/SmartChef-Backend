@@ -13,7 +13,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "historial_cocina")
+@Table(name = "historial_cocina", schema = "smartchef")
 public class HistorialCocina {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

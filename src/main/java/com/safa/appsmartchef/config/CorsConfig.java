@@ -10,7 +10,13 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://smartchef-aovf.onrender.com", "https://smartchef-backend-h4ve.onrender.com")
+                .allowedOrigins(
+                        "https://smartchef-aovf.onrender.com",
+                        "https://localhost",
+                        "http://localhost",
+                        "capacitor://localhost",
+                        "ionic://localhost"
+                )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
